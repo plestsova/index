@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Калькулятор дробей</title>
+<style>
+body{font-family:Arial,sans-serif;background:#eef2f7;margin:0;padding:20px;display:flex;justify-content:center}
+.box{background:#fff;padding:25px;border-radius:20px;max-width:760px;width:100%;box-shadow:0 8px 20px rgba(0,0,0,.1)}
+h1{text-align:center;color:#1e3c72;margin:0 0 15px}
+.badge{text-align:center;color:#5c7290;font-size:14px;margin-bottom:15px;padding:10px;background:#f0f5ff;border-radius:10px;font-weight:600}
+.row{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.frac-label{font-size:12px;color:#888;text-align:center;margin-bottom:3px}
+input[type=number]{width:70px;padding:10px;font-size:16px;text-align:center;border:1px solid #ccd;border-radius:8px;font-family:monospace}
+input.whole{width:60px;background:#fff7e6;border-color:#f0d090}
+.op{font-size:24px;font-weight:bold;color:#1e3c72;padding:0 10px}
+button{padding:10px 18px;font-size:15px;border:none;border-radius:8px;background:#1e3c72;color:#fff;cursor:pointer;margin:3px;font-weight:600}
+button:hover{opacity:.9}
+.opbtn{background:#dce6f5;color:#1e3c72;font-size:20px;font-weight:bold;width:52px;padding:8px 0}
+.opbtn.active{background:#1e3c72;color:#fff}
+.result{background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;padding:18px;border-radius:14px;margin:18px 0}
+.rr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;flex-wrap:wrap;gap:8px}
+.rr+.rr{border-top:1px solid rgba(255,255,255,.2)}
+.rr .label{font-size:14px;opacity:.9}
+.rr .val{font-size:20px;font-weight:bold;font-family:monospace;background:rgba(255,255,255,.15);padding:4px 16px;border-radius:20px;min-width:100px;text-align:center}
+.sol{background:#f5f8ff;border-radius:12px;padding:15px;margin-top:15px}
+.sol h3{margin:0 0 10px;color:#1e3c72}
+.step{background:#fff;padding:10px 14px;border-radius:8px;margin-bottom:8px;border-left:4px solid #3b6cb0;font-size:14px;line-height:1.5}
+.step:last-child{border-left-color:#2ea44f;background:#f2fcf5;font-weight:600}
+.step b.num{display:inline-block;background:#1e3c72;color:#fff;border-radius:50%;width:20px;height:20px;text-align:center;font-size:12px;line-height:20px;margin-right:6px}
+.step:last-child b.num{background:#2ea44f}
+.err{color:#c00;background:#ffe8e8;padding:12px;border-radius:8px;text-align:center;margin-top:10px;display:none;font-weight:600}
+.err.show{display:block}
+.modes{display:flex;justify-content:center;gap:8px;margin-bottom:15px}
+.modes button{background:#ccc;color:#333}
+.modes button.active{background:#1e3c72;color:#fff}
+.typebox{background:#eef7ee;border:2px dashed #2ea44f;border-radius:10px;padding:10px;margin-bottom:15px;text-align:center;font-size:14px;color:#116b2c}
+.typebox b{font-size:16px}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>🧮 Калькулятор дробей</h1>
+<div class="badge" id="badge">Введите дробь</div>
+
+<div class="typebox" id="typebox">
+  Тип дроби 1: <b id="type1">—</b> &nbsp;|&nbsp; Тип дроби 2: <b id="type2">—</b>
+</div>
+
+<div class="modes">
+  <button id="modeSimple" class="active">Обычные (правильные / неправильные)</button>
+  <button id="modeMixed">Смешанные</button>
+</div>
+
+<div class="row">
+  <div>
+    <div class="frac-label">Дробь 1</div>
+    <input type="number" id="w1" class="whole" value="0" placeholder="цел." style="display:none">
+    <input type="number" id="n1" value="7" placeholder="числ.">
+    /
+    <input type="number" id="d1" value="3" placeholder="знам.">
+  </div>
+  <div class="op" id="opDisp">+</div>
+  <div>
+    <div class="frac-label">Дробь 2</div>
+    <input type="number" id="w2" class="whole" value="0" placeholder="цел." style="display:none">
+    <input type="number" id="n2" value="2" placeholder="числ.">
+    /
+    <input type="number" id="d2" value="3" placeholder="знам.">
+  </div>
+</div>
+
+<div class="row">
+  <button class="opbtn active" data-op="+">+</button>
+  <button class="opbtn" data-op="-">−</button>
+  <button class="opbtn" data-op="*">×</button>
+  <button class="opbtn" data-op="/">÷</button>
+</div>
+
+<div class="result">
+  <div class="rr"><span class="label">📐 Обыкновенная:</span><span class="val" id="rDisp">3</span></div>
+  <div class="rr"><span class="label">🔢 Смешанная:</span><span class="val" id="mDisp">3</span></div>
+  <div class="rr"><span class="label">💯 Десятичная:</span><span class="val" id="decDisp">3</span></div>
+  <div class="rr"><span class="label">📊 Тип результата:</span><span class="val" id="tDisp">целое</span></div>
+</div>
+
+<div class="row">
+  <button id="calcBtn">🔍 Вычислить</button>
+  <button id="clrBtn" style="background:#888">🧹 Очистить</button>
+</div>
+
+<div class="err" id="err"></div>
+
+<div class="sol">
+  <h3>📝 Пошаговое решение</h3>
+  <div id="steps"></div>
+</div>
+</div>
+
+<script>
+// === Элементы ===
+var w1 = document.getElementById('w1');
+var n1 = document.getElementById('n1');
+var d1 = document.getElementById('d1');
+var w2 = document.getElementById('w2');
+var n2 = document.getElementById('n2');
+var d2 = document.getElementById('d2');
+var opDisp = document.getElementById('opDisp');
+var rDisp = document.getElementById('rDisp');
+var mDisp = document.getElementById('mDisp');
+var decDisp = document.getElementById('decDisp');
+var tDisp = document.getElementById('tDisp');
+var errBox = document.getElementById('err');
+var steps = document.getElementById('steps');
+var badge = document.getElementById('badge');
+var type1 = document.getElementById('type1');
+var type2 = document.getElementById('type2');
+var calcBtn = document.getElementById('calcBtn');
+var clrBtn = document.getElementById('clrBtn');
+var modeSimple = document.getElementById('modeSimple');
+var modeMixed = document.getElementById('modeMixed');
+var opBtns = document.querySelectorAll('.opbtn');
+
+var curOp = '+';
+var curMode = 'simple';
+
+// === Математика ===
+function gcd(a, b) {
+  a = Math.abs(a); b = Math.abs(b);
+  while (b) { var t = b; b = a % b; a = t; }
+  return a || 1;
+}
+function lcm(a, b) {
+  if (!a || !b) return 0;
+  return Math.abs(a * b) / gcd(a, b);
+}
+function reduce(n, d) {
+  if (d === 0) return { num: 0, den: 0, error: true };
+  var nn = n, dd = d;
+  if (dd < 0) { nn = -nn; dd = -dd; }
+  var g = gcd(nn, dd);
+  nn = nn / g; dd = dd / g;
+  if (nn === 0) dd = 1;
+  return { num: nn, den: dd };
+}
+function toMixed(n, d) {
+  if (d === 0) return { whole: 0, num: 0, den: 1, isInt: true };
+  if (d === 1) return { whole: n, num: 0, den: 1, isInt: true };
+  if (n === 0) return { whole: 0, num: 0, den: 1, isInt: true };
+  var w = Math.trunc(n / d);
+  var rem = Math.abs(n % d);
+  if (rem === 0) return { whole: w, num: 0, den: 1, isInt: true };
+  var r = reduce(rem, Math.abs(d));
+  return { whole: w, num: r.num, den: r.den, isInt: false };
+}
+function toImproper(w, n, d) {
+  if (d === 0) return { num: 0, den: 0, error: true };
+  if (d < 0) { d = -d; n = -n; }
+  var s = w < 0 ? -1 : 1;
+  return { num: s * (Math.abs(w) * d + Math.abs(n)), den: d };
+}
+function ftype(n, d) {
+  if (d === 0) return 'не определён';
+  var an = Math.abs(n), ad = Math.abs(d);
+  if (an === 0) return 'нулевая';
+  if (an < ad) return 'правильная';
+  if (an === ad) return 'равна 1';
+  if (an % ad === 0) return 'целое число';
+  return 'неправильная';
+}
+function fstr(n, d) {
+  if (d === 1) return '' + n;
+  if (n === 0) return '0';
+  return n + '/' + d;
+}
+function mstr(m) {
+  if (m.isInt || m.num === 0) return '' + m.whole;
+  if (m.whole === 0) return m.num + '/' + m.den;
+  return m.whole + ' ' + m.num + '/' + m.den;
+}
+function osym(o) {
+  return o === '+' ? '+' : o === '-' ? '−' : o === '*' ? '×' : '÷';
+}
+function readN(el, def) {
+  var v = el.value.trim();
+  if (v === '') return def;
+  var n = Number(v);
+  return isFinite(n) ? n : null;
+}
+
+// === Операции ===
+function operate(a, b, c, d, op) {
+  if (op === '+') return reduce(a * d + c * b, b * d);
+  if (op === '-') return reduce(a * d - c * b, b * d);
+  if (op === '*') return reduce(a * c, b * d);
+  if (op === '/') {
+    if (c === 0) return { error: true, message: 'Деление на ноль!' };
+    return reduce(a * d, b * c);
+  }
+  return { error: true, message: 'Неизвестная операция' };
+}
+
+// === Ошибки ===
+function showErr(msg) {
+  errBox.textContent = '⚠️ ' + msg;
+  errBox.classList.add('show');
+  rDisp.textContent = '—';
+  mDisp.textContent = '—';
+  decDisp.textContent = '—';
+  tDisp.textContent = '—';
+  steps.innerHTML = '<div class="step">Исправьте ошибку.</div>';
+}
+function hideErr() {
+  errBox.classList.remove('show');
+}
+
+// === Пошаговое решение ===
+function buildSteps(a, b, c, d, op, res, ww1, ww2) {
+  var s = [], k = 1, sym = osym(op);
+  var e1 = ww1 !== 0 ? ww1 + ' ' + Math.abs(a) + '/' + b : fstr(a, b);
+  var e2 = ww2 !== 0 ? ww2 + ' ' + Math.abs(c) + '/' + d : fstr(c, d);
+  s.push({ n: k++, h: 'Записываем пример: <b>' + e1 + ' ' + sym + ' ' + e2 + '</b>' });
+
+  // Если дробь неправильная — показываем преобразование в смешанную
+  if (ww1 === 0 && Math.abs(a) >= b && b !== 0 && a % b !== 0) {
+    var mx1 = toMixed(a, b);
+    s.push({ n: k++, h: '📗 Дробь ' + a + '/' + b + ' — <b>неправильная</b>. Можно записать как смешанную: <b>' + mstr(mx1) + '</b> (для решения оставляем как ' + a + '/' + b + ')' });
+  }
+  if (ww2 === 0 && Math.abs(c) >= d && d !== 0 && c % d !== 0) {
+    var mx2 = toMixed(c, d);
+    s.push({ n: k++, h: '📗 Дробь ' + c + '/' + d + ' — <b>неправильная</b>. Можно записать как смешанную: <b>' + mstr(mx2) + '</b> (для решения оставляем как ' + c + '/' + d + ')' });
+  }
+
+  if (ww1 !== 0 || ww2 !== 0) {
+    var p = [];
+    if (ww1 !== 0) p.push(ww1 + ' ' + Math.abs(a) + '/' + b + ' = ' + a + '/' + b);
+    if (ww2 !== 0) p.push(ww2 + ' ' + Math.abs(c) + '/' + d + ' = ' + c + '/' + d);
+    s.push({ n: k++, h: '🔄 Преобразуем смешанные дроби в неправильные: <b>' + p.join('</b> и <b>') + '</b>' });
+  }
+
+  if (op === '+' || op === '-') {
+    var cd = lcm(b, d);
+    var f1 = cd / b, f2 = cd / d;
+    var q1 = a * f1, q2 = c * f2;
+    var rn = op === '+' ? q1 + q2 : q1 - q2;
+    s.push({ n: k++, h: 'Общий знаменатель: НОК(' + b + ', ' + d + ') = <b>' + cd + '</b>' });
+    s.push({ n: k++, h: 'Доп. множители: <b>' + f1 + '</b> и <b>' + f2 + '</b>. Получаем: ' + q1 + '/' + cd + ' и ' + q2 + '/' + cd });
+    s.push({ n: k++, h: (op === '+' ? 'Складываем' : 'Вычитаем') + ' числители: (' + q1 + ' ' + (op === '+' ? '+' : '−') + ' ' + q2 + ') / ' + cd + ' = <b>' + rn + '/' + cd + '</b>' });
+  } else if (op === '*') {
+    s.push({ n: k++, h: 'Правило: перемножаем числители и знаменатели.' });
+    s.push({ n: k++, h: 'Числители: ' + a + ' × ' + c + ' = <b>' + (a * c) + '</b>' });
+    s.push({ n: k++, h: 'Знаменатели: ' + b + ' × ' + d + ' = <b>' + (b * d) + '</b>' });
+  } else if (op === '/') {
+    s.push({ n: k++, h: 'Правило: деление = умножение на перевёрнутую дробь: ' + fstr(a, b) + ' × ' + fstr(d, c) });
+    s.push({ n: k++, h: 'Перемножаем: (' + a + ' × ' + d + ') / (' + b + ' × ' + c + ') = <b>' + (a * d) + '/' + (b * c) + '</b>' });
+  }
+
+  if (res.error) {
+    s.push({ n: k++, h: '❌ Ошибка: ' + (res.message || '') });
+    return s;
+  }
+
+  var rN, rD;
+  if (op === '+') { var cc = lcm(b, d); rN = a * (cc / b) + c * (cc / d); rD = cc; }
+  else if (op === '-') { var cc2 = lcm(b, d); rN = a * (cc2 / b) - c * (cc2 / d); rD = cc2; }
+  else if (op === '*') { rN = a * c; rD = b * d; }
+  else { rN = a * d; rD = b * c; }
+
+  var div = Math.abs(gcd(rN, rD));
+  if (div > 1) {
+    s.push({ n: k++, h: '✂️ Сокращаем на <b>' + div + '</b>: ' + rN + '/' + rD + ' = <b>' + res.num + '/' + res.den + '</b>' });
+  } else {
+    s.push({ n: k++, h: 'Дробь ' + rN + '/' + rD + ' уже несократима.' });
+  }
+
+  var mx = toMixed(res.num, res.den);
+  var fin = fstr(res.num, res.den);
+  var t = ftype(res.num, res.den);
+  var extra = '';
+  if (t === 'неправильная') {
+    extra = ' — это <b>неправильная</b> дробь, равная смешанной <b>' + mstr(mx) + '</b>';
+  } else if (t === 'целое число') {
+    extra = ' — это <b>целое число</b>';
+  } else if (t === 'правильная') {
+    extra = ' — это <b>правильная</b> дробь';
+  }
+  s.push({ n: k++, h: '✅ Ответ: <b>' + fin + '</b>' + extra });
+  return s;
+}
+
+function renderSteps(arr) {
+  var h = '';
+  for (var i = 0; i < arr.length; i++) {
+    h += '<div class="step"><b class="num">' + arr[i].n + '</b>' + arr[i].h + '</div>';
+  }
+  steps.innerHTML = h;
+}
+
+// === Главная функция ===
+function calc() {
+  hideErr();
+  var aR = readN(n1, 0), bR = readN(d1, 1), cR = readN(n2, 0), dR = readN(d2, 1);
+  if (aR === null || bR === null || cR === null || dR === null) {
+    showErr('Заполните все поля числами');
+    return;
+  }
+  if (bR === 0 || dR === 0) {
+    showErr('Знаменатель не может быть 0');
+    return;
+  }
+
+  var ww1 = 0, ww2 = 0, a = aR, b = bR, c = cR, d = dR;
+  if (curMode === 'mixed') {
+    ww1 = readN(w1, 0) || 0;
+    ww2 = readN(w2, 0) || 0;
+    var i1 = toImproper(ww1, aR, bR);
+    var i2 = toImproper(ww2, cR, dR);
+    a = i1.num; b = i1.den; c = i2.num; d = i2.den;
+  }
+
+  var res = operate(a, b, c, d, curOp);
+  if (res.error) { showErr(res.message || 'Ошибка'); return; }
+
+  // Показываем ответ как обычную, смешанную и десятичную
+  rDisp.textContent = fstr(res.num, res.den);
+  var mx = toMixed(res.num, res.den);
+  mDisp.textContent = mstr(mx);
+
+  var dec = res.num / res.den;
+  if (Number.isInteger(dec)) decDisp.textContent = '' + dec;
+  else decDisp.textContent = dec.toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
+
+  tDisp.textContent = ftype(res.num, res.den);
+  renderSteps(buildSteps(a, b, c, d, curOp, res, ww1, ww2));
+}
+
+// === Обновление типов дробей ===
+function updateTypes() {
+  var a = readN(n1, 0), b = readN(d1, 1);
+  var c = readN(n2, 0), d = readN(d2, 1);
+  if (a === null) a = 0; if (b === null || b === 0) b = 1;
+  if (c === null) c = 0; if (d === null || d === 0) d = 1;
+
+  var t1 = ftype(a, b);
+  var t2 = ftype(c, d);
+
+  var icons = {
+    'правильная': '📘 правильная',
+    'неправильная': '📗 НЕПРАВИЛЬНАЯ',
+    'целое число': '📙 целое число',
+    'равна 1': '📕 равна 1',
+    'нулевая': '⬜ нулевая'
+  };
+
+  type1.textContent = icons[t1] || t1;
+  type2.textContent = icons[t2] || t2;
+
+  // Общий бейдж
+  var all = t1 + ' | ' + t2;
+  if (t1 === 'неправильная' || t2 === 'неправильная') {
+    badge.innerHTML = '📗 Есть <b>неправильная</b> дробь — она будет преобразована в смешанную в решении';
+    badge.style.background = '#eef7ee';
+  } else {
+    badge.innerHTML = '📘 Типы: ' + t1 + ' и ' + t2;
+    badge.style.background = '#f0f5ff';
+  }
+}
+
+// === События ===
+calcBtn.onclick = function () { calc(); updateTypes(); };
+clrBtn.onclick = function () {
+  n1.value = 7; d1.value = 3;
+  n2.value = 2; d2.value = 3;
+  w1.value = 0; w2.value = 0;
+  curOp = '+';
+  opDisp.textContent = '+';
+  for (var i = 0; i < opBtns.length; i++) {
+    opBtns[i].classList.remove('active');
+    if (opBtns[i].getAttribute('data-op') === '+') opBtns[i].classList.add('active');
+  }
+  calc();
+  updateTypes();
+};
+
+for (var i = 0; i < opBtns.length; i++) {
+  opBtns[i].onclick = function () {
+    curOp = this.getAttribute('data-op');
+    opDisp.textContent = osym(curOp);
+    for (var j = 0; j < opBtns.length; j++) opBtns[j].classList.remove('active');
+    this.classList.add('active');
+    calc();
+  };
+}
+
+modeSimple.onclick = function () {
+  curMode = 'simple';
+  w1.style.display = 'none';
+  w2.style.display = 'none';
+  modeSimple.classList.add('active');
+  modeMixed.classList.remove('active');
+  calc();
+  updateTypes();
+};
+
+modeMixed.onclick = function () {
+  curMode = 'mixed';
+  w1.style.display = 'inline-block';
+  w2.style.display = 'inline-block';
+  modeMixed.classList.add('active');
+  modeSimple.classList.remove('active');
+  calc();
+  updateTypes();
+};
+
+var inputs = [w1, n1, d1, w2, n2, d2];
+for (var k = 0; k < inputs.length; k++) {
+  inputs[k].oninput = function () { calc(); updateTypes(); };
+}
+
+// === Старт ===
+calc();
+updateTypes();
+</script>
+</body>
+</html>
